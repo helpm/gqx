@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>动态创建表格</title>
+		<style type="text/css">
+			#my_table{
+				margin: 0 auto;
+				width: 70%;
+				text-align: center;
+			}
+
+			div{
+				text-align: center;
+				line-height: 50px;
+			}
+		</style>
+		<script type="text/javascript" src="dom.js"></script>
+	</head>
+	<body>
+		<table id="my_table" border="1px">
+			<thead>
+				<tr>
+					<th>姓名</th>
+					<th>性别</th>
+					<th>年龄</th>
+					<th>住址</th>
+					<th>操作</th>
+					<th>选择</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- <tr>
+					<td>刘升升</td>
+					<td>男</td>
+					<td>18</td>
+					<td>二拨子新村</td>
+					<td><input type="button" value="新增" /> <input type="button" value="删除" /></td>
+					<td><input type="checkbox" /></td>
+				</tr> -->
+			</tbody>
+		</table>
+		<div>
+			<input type="button" value="全选" onclick="ckFn(this);" />
+			<input type="button" value="取消全选" onclick="ckFn(this);" />
+			<input type="button" value="反选" onclick="ckFn(this);" />
+			<input type="button" value="选择删除" onclick="ckDelFn(this);" />
+		</div>
+
+		<script type="text/javascript">
+
+			//获取tbody元素节点
+			var tBody = $ByTagName("tbody")[0];
+
+			//构建UI函数
+			function initUI () {
+				//调用加载数据的函数
+				var personArr = loadData();
+
+				//数组的元素的个数就是最后tr的个数，所以要遍历数组
+				//模拟下标，做下隔行换色的效果
+				var index = 0;
+				for (var tempPersonMap of personArr) {
+					//动态创建tr
+					var tempTr = cE("tr");
+					//偶数行用随机颜色
+					// if (index % 2 == 0) {
+					// 	tempTr.style.backgroundColor = "gold"//getColor();
+					// }
+					//添加到tbody中
+					tBody.appendChild(tempTr);
+
+					//创建当前tr中的各种td
+					var tempNameTd = cE("td");
+					var tempSexTd = cE("td");
+					var tempAgeTd = cE("td");
+					var tempAddrTd = cE("td");
+					var tempOperationTd = cE("td");
+					var tempCheckTd = cE("td");
+
+					//把6个td添加到当前tr中
+					tempTr.appendChild(tempNameTd);
+					tempTr.appendChild(tempSexTd);
+					tempTr.appendChild(tempAgeTd);
+					tempTr.appendChild(tempAddrTd);
+					tempTr.appendChild(tempOperationTd);
+					tempTr.appendChild(tempCheckTd);
+
+					//创建4个input
+					var tempNameInput = cE("input");
+					tempNameInput.name = "didi";
+					tempNameInput.style.width = "100px";
+					tempNameInput.type = "text";
+					tempNameInput.style.border = "white";
+					var tempSexInput = cE("input");
+					tempSexInput.name = "didi";
+					tempSexInput.style.border = "white";
+					var tempAgeInput = cE("input");
+					tempAgeInput.style.border = "white";
+					tempAgeInput.name = "didi";
+					var tempAddrInput = cE("input");
+					tempAddrInput.name = "didi";
+					 tempAddrInput.style.border = "white";
+					tempNameInput.style.width = "100px";
+					tempNameInput.type = "text";
+					tempNameInput.onblur = function () {
+									this.parentNode.appendChild(input.Text);
+									this.parentNode.removeChild(input);
+									}
+
+					//把4个input添加到td里面
+
+					tempNameTd.appendChild(tempNameInput);
+					tempSexTd.appendChild(tempSexInput);
+					tempAgeTd.appendChild(tempAgeInput);
+					tempAddrTd.appendChild(tempAddrInput);
+
+
+					//创建数据的文本节点 4个
+					var tempNameValue = cT(tempPersonMap.get("name"));
+					var tempSexValue = cT(tempPersonMap.get("sex"));
+					var tempAgeValue = cT(tempPersonMap.get("age"));
+					var tempAddrValue = cT(tempPersonMap.get("addr"));
+
+
+					//点击input的时候
+					var inputdidi = document.getElementsByName("didi");
+					for(i = 0; i< inputdidi.length; i++){
+						inputdidi[i].ondblclick = clickFn;
+						function clickFn () {
+							this.value = "";
+							this.style.border = "red";
+						}
+
+
+
+						inputdidi[i].onblur = function () {
+									this.parentNode.appendChild(inputText);
+									this.parentNode.removeChild(input);
+									}
+						
+					}
+
+
+
+
+					//把以上4个文本节点添加到对应的input中
+					tempNameInput.value = (tempPersonMap.get("name"))
+					tempSexInput.value = (tempPersonMap.get("sex"));
+					tempAgeInput.value = (tempPersonMap.get("age"));
+					tempAddrInput.value = (tempPersonMap.get("addr"));
+
+					//创建操作中的两个按钮
+					var tempInsertBtn = cE("input");
+					tempInsertBtn.type = "button";
+					tempInsertBtn.value = "新增";
+					tempInsertBtn.setAttribute("onclick", "insertFn(this);");
+
+					var tempDelBtn = cE("input");
+					tempDelBtn.type = "button";
+					tempDelBtn.value = "删除";
+					tempDelBtn.setAttribute("onclick", "delFn(this);");
+
+					//把新增按钮和删除按钮添加到对应的td中
+					tempOperationTd.appendChild(tempInsertBtn);
+					tempOperationTd.appendChild(tempDelBtn);
+
+					//创建checkbox
+					var tempCheckbox = cE("input");
+					tempCheckbox.type = "checkbox";
+					tempCheckbox.name = "ck";
+
+					//把checkbox添加到对应的td中
+					tempCheckTd.appendChild(tempCheckbox);
+
+					
+				}
+
+
+			}
+
+			//全选、取消全选、反选
+			function ckFn (ele) {
+				var ckArr = document.getElementsByName("ck");
+
+				if (ele.value == '全选') {
+					for (var i = 0; i < ckArr.length; i++) {
+						ckArr[i].checked = true;
+					}
+				} else if (ele.value == '取消全选') {
+					for (var i = 0; i < ckArr.length; i++) {
+						ckArr[i].checked = false;
+					}
+				} else {
+					for (var i = 0; i < ckArr.length; i++) {
+						if (ckArr[i].checked == true) {
+							ckArr[i].checked = false;
+						} else {
+							ckArr[i].checked = true;
+						}
+					}
+				}
+			}
+
+			//选择删除tr
+			function ckDelFn (ele) {
+				//获得所有的checkbox
+				var ckArr = document.getElementsByName("ck");
+				for (var i = 0; i < ckArr.length; i++) {
+					//判断当前的checkbox是否为选中
+					if (ckArr[i].checked == true) {
+						//找到当前所在tr，并且删除
+						tBody.removeChild(ckArr[i].parentNode.parentNode);
+						//每次删除后，checkbox的长度会变，所以要修改下标
+						i--;
+					}
+				}
+			}
+
+			//单行删除
+			function delFn (ele) {
+				tBody.removeChild(ele.parentNode.parentNode);
+			}
+
+			//新增（为了简化开发，新增就是克隆当前tr，然后把克隆出来的tr插入到当前tr的前面）
+			function insertFn (ele) {
+				var tempTr = cE("tr");
+					//偶数行用随机颜色
+					// if (index % 2 == 0) {
+					// 	tempTr.style.backgroundColor = "gold"//getColor();
+					// }
+					//添加到tbody中
+					tBody.appendChild(tempTr);
+
+					//创建当前tr中的各种td
+					var tempNameTd = cE("td");
+					var tempSexTd = cE("td");
+					var tempAgeTd = cE("td");
+					var tempAddrTd = cE("td");
+					var tempOperationTd = cE("td");
+					var tempCheckTd = cE("td");
+
+					//把6个td添加到当前tr中
+					tempTr.appendChild(tempNameTd);
+					tempTr.appendChild(tempSexTd);
+					tempTr.appendChild(tempAgeTd);
+					tempTr.appendChild(tempAddrTd);
+					tempTr.appendChild(tempOperationTd);
+					tempTr.appendChild(tempCheckTd);
+
+					//创建4个input
+					var tempNameInput = cE("input");
+					tempNameInput.name = "didi";
+					tempNameInput.style.width = "100px";
+					tempNameInput.type = "text";
+					tempNameInput.style.border = "white";
+					var tempSexInput = cE("input");
+					tempSexInput.name = "didi";
+					tempSexInput.style.border = "white";
+					var tempAgeInput = cE("input");
+					tempAgeInput.style.border = "white";
+					tempAgeInput.name = "didi";
+					var tempAddrInput = cE("input");
+					tempAddrInput.name = "didi";
+					 tempAddrInput.style.border = "white";
+					tempNameInput.style.width = "100px";
+					tempNameInput.type = "text";
+
+					//把4个input添加到td里面
+
+					tempNameTd.appendChild(tempNameInput);
+					tempSexTd.appendChild(tempSexInput);
+					tempAgeTd.appendChild(tempAgeInput);
+					tempAddrTd.appendChild(tempAddrInput);
+
+					//点击input的时候
+					var inputdidi = document.getElementsByName("didi");
+					for(i = 0; i< inputdidi.length; i++){
+						inputdidi[i].ondblclick = clickFn;
+						function clickFn () {
+							this.value = "";
+							this.style.border = "red";
+						}
+
+					}
+
+						inputdidi[i].onblur = function () {
+									this.parentNode.appendChild(inputText);
+									this.parentNode.removeChild(input);
+									}
+						
+				
+
+					//创建操作中的两个按钮
+					var tempInsertBtn = cE("input");
+					tempInsertBtn.type = "button";
+					tempInsertBtn.value = "新增";
+					tempInsertBtn.setAttribute("onclick", "insertFn(this);");
+
+					var tempDelBtn = cE("input");
+					tempDelBtn.type = "button";
+					tempDelBtn.value = "删除";
+					tempDelBtn.setAttribute("onclick", "delFn(this);");
+
+					//把新增按钮和删除按钮添加到对应的td中
+					tempOperationTd.appendChild(tempInsertBtn);
+					tempOperationTd.appendChild(tempDelBtn);
+
+					//创建checkbox
+					var tempCheckbox = cE("input");
+					tempCheckbox.type = "checkbox";
+					tempCheckbox.name = "ck";
+
+					//把checkbox添加到对应的td中
+					tempCheckTd.appendChild(tempCheckbox);
+
+					
+				
+			}
+
+			
+			//模拟网络获取数据的函数
+			function loadData () {
+				//我们利用Map这种数据结构来存储一个人的基本信息
+				//简化开发，利用循环动态创建10个map，相当于创建了10个人，一会儿会对应10个tr元素。
+
+				//最后的数据数组，数组中存储的是10个map。
+				var resultArr = new Array();
+
+				for (var i = 0; i < 10; i++) {
+					var map = new Map();
+					map.set("name", "刘升升" + i);
+					map.set("sex", (i % 2 == 0) ? "男" : "女");
+					map.set("age", 18 + i);
+					map.set("addr", "二拨子新村" + i);
+					//每次循环创建的map，存储到最后的数组中，这样map就丢不了了。
+					resultArr.push(map);
+				}
+
+				// console.log(resultArr);
+	
+				return resultArr;
+			
+				// var map1 = new Map();
+				// map1.set("name", "刘升升1");
+				// map1.set("sex", "男1");
+				// map1.set("age", 181);
+				// map1.set("addr", "二拨子新村1");
+
+			}
+
+			//调用构建UI函数
+			initUI();
+
+
+
+
+		</script>
+	</body>
+</html>	
